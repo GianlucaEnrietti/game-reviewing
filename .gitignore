@@ -36,6 +36,9 @@ yarn-error.log*
 # vercel
 .vercel
 
+# Supabase SQL (ejecutar manualmente en el dashboard, no versionar)
+supabase/*.sql
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts
