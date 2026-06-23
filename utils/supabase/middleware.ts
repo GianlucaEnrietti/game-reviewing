@@ -40,7 +40,9 @@ export async function updateSession(request: NextRequest) {
 
   const { pathname } = request.nextUrl;
   const isAdminArea =
-    pathname.startsWith("/admin") && pathname !== "/admin/acceder";
+    pathname.startsWith("/admin") &&
+    pathname !== "/admin/acceder" &&
+    pathname !== "/admin/completar-invitacion";
 
   if (isAdminArea && !user) {
     const loginUrl = request.nextUrl.clone();

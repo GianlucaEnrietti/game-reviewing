@@ -3,6 +3,8 @@ import Link from "next/link";
 import { createClient } from "../utils/supabase/server";
 import { Review } from "../data/reviews";
 import StarDisplay from "../components/star-display";
+import RandomReviewsSlider from "../components/random-reviews-slider";
+import { getRandomReviews, RANDOM_REVIEWS_MAX } from "../utils/reviews/random-reviews";
 
 export const metadata = {
   title: "Game Reviews",
@@ -20,12 +22,15 @@ function formatDate(date: string) {
 
 export default async function Home() {
   const supabase = await createClient();
-  const { data: recentReviews, error } = await supabase
-    .from("reviews")
-    .select("*")
-    .order("created_at", { ascending: false })
-    .limit(3)
-    .returns<Review[]>();
+  const [{ data: recentReviews, error }, randomReviews] = await Promise.all([
+    supabase
+      .from("reviews")
+      .select("*")
+      .order("created_at", { ascending: false })
+      .limit(3)
+      .returns<Review[]>(),
+    getRandomReviews(),
+  ]);
 
   return (
     <Container>
@@ -55,16 +60,16 @@ export default async function Home() {
               key={review.id}
               className="overflow-hidden rounded-xl border border-slate-800 bg-slate-900"
             >
-              <div className="h-40 w-full bg-slate-800">
+              <div className="relative aspect-[16/9] w-full shrink-0 overflow-hidden bg-slate-800">
                 {review.cover_image ? (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img
                     src={review.cover_image}
                     alt={review.title}
-                    className="h-full w-full object-cover"
+                    className="absolute inset-0 h-full w-full object-cover object-center"
                   />
                 ) : (
-                  <div className="flex h-full w-full items-center justify-center text-slate-400">
+                  <div className="absolute inset-0 flex items-center justify-center text-slate-400">
                     Sin imagen
                   </div>
                 )}
@@ -100,11 +105,12 @@ export default async function Home() {
         </div>
       </section>
 
-      <section className="mt-16 rounded-xl border border-dashed border-slate-700 bg-slate-900 p-8 text-center">
-        <h2 className="text-xl font-semibold">Próximamente</h2>
-        <p className="mt-2 text-slate-300">
-          Este espacio queda reservado para nuevas secciones.
+      <section className="mt-16">
+        <h2 className="text-xl font-semibold">Reseñas random</h2>
+        <p className="mt-1 text-sm text-slate-400">
+          ¡Chequeá estas reviews!
         </p>
+        <RandomReviewsSlider reviews={randomReviews} />
       </section>
     </Container>
   );

@@ -1,6 +1,7 @@
 import "./globals.css";
 import Header from "../components/header";
 import Footer from "../components/footer";
+import InviteHashRedirect from "../components/auth/invite-hash-redirect";
 import { Inter } from "next/font/google";
 
 const inter = Inter({
@@ -21,6 +22,7 @@ export default function RootLayout({
   return (
     <html lang="es">
       <body className={`${inter.variable} min-h-screen font-sans bg-slate-950 text-slate-100`}>
+        <InviteHashRedirect />
         <Header />
         <main>{children}</main>
         <Footer />

@@ -26,6 +26,10 @@ export type UpdateReviewState = {
   error?: string;
 };
 
+export type CompleteInviteState = {
+  error?: string;
+};
+
 const COVERS_BUCKET = "review-covers";
 
 const initialState: AuthActionState = {};
@@ -192,6 +196,65 @@ export async function signInAdmin(
     ip,
     userAgent,
   });
+
+  redirect("/admin");
+}
+
+const initialCompleteInviteState: CompleteInviteState = {};
+
+export async function completeInviteSignup(
+  _prevState: CompleteInviteState = initialCompleteInviteState,
+  formData: FormData
+): Promise<CompleteInviteState> {
+  const password = String(formData.get("password") ?? "");
+  const confirmPassword = String(formData.get("confirmPassword") ?? "");
+  const nickname = String(formData.get("nickname") ?? "").trim();
+
+  if (nickname.length < 2) {
+    return { error: "El nickname debe tener al menos 2 caracteres." };
+  }
+
+  if (password.length < 8) {
+    return { error: "La contraseña debe tener al menos 8 caracteres." };
+  }
+
+  if (password !== confirmPassword) {
+    return { error: "Las contraseñas no coinciden." };
+  }
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return {
+      error:
+        "El enlace de invitación expiró o no es válido. Pide una nueva invitación.",
+    };
+  }
+
+  if (await isAdminUser(supabase, user.id)) {
+    redirect("/admin");
+  }
+
+  const { error: passwordError } = await supabase.auth.updateUser({ password });
+
+  if (passwordError) {
+    return { error: passwordError.message };
+  }
+
+  const { error: profileError } = await supabase.rpc("complete_invite_profile", {
+    p_nickname: nickname,
+  });
+
+  if (profileError) {
+    console.error("[auth] complete_invite_profile failed", {
+      code: profileError.code,
+      message: profileError.message,
+    });
+    return { error: "No se pudo guardar el perfil. Intenta de nuevo." };
+  }
 
   redirect("/admin");
 }
