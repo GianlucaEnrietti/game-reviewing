@@ -1,65 +1,111 @@
-import Image from "next/image";
+import Container from "../components/container";
+import Link from "next/link";
+import { createClient } from "../utils/supabase/server";
+import { Review } from "../data/reviews";
+import StarDisplay from "../components/star-display";
 
-export default function Home() {
+export const metadata = {
+  title: "Game Reviews",
+  description: "Reseñas, opiniones y noticias sobre videojuegos",
+};
+
+
+function formatDate(date: string) {
+  return new Date(date).toLocaleDateString("es-AR", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+  });
+}
+
+export default async function Home() {
+  const supabase = await createClient();
+  const { data: recentReviews, error } = await supabase
+    .from("reviews")
+    .select("*")
+    .order("created_at", { ascending: false })
+    .limit(3)
+    .returns<Review[]>();
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
+    <Container>
+      <section className="pt-8">
+        <h1 className="max-w-4xl text-4xl font-extrabold tracking-tight md:text-6xl">
+          Reseñas de videojuegos simples y personales.
+        </h1>
+
+        <p className="mt-5 max-w-3xl text-lg text-slate-300">
+          Reseñas, opiniones y noticias sobre videojuegos, escritas por
+          jugadores.
+        </p>
+      </section>
+
+      <section className="mt-10">
+        <h2 className="text-xl font-semibold">Reseñas más recientes</h2>
+
+        {error && (
+          <p className="mt-4 text-sm text-red-400">
+            No se pudieron cargar las reseñas en este momento.
           </p>
+        )}
+
+        <div className="mt-5 grid gap-4 md:grid-cols-3">
+          {(recentReviews ?? []).map((review) => (
+            <article
+              key={review.id}
+              className="overflow-hidden rounded-xl border border-slate-800 bg-slate-900"
+            >
+              <div className="h-40 w-full bg-slate-800">
+                {review.cover_image ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={review.cover_image}
+                    alt={review.title}
+                    className="h-full w-full object-cover"
+                  />
+                ) : (
+                  <div className="flex h-full w-full items-center justify-center text-slate-400">
+                    Sin imagen
+                  </div>
+                )}
+              </div>
+
+              <div className="p-4">
+                <h3 className="text-2xl font-semibold leading-tight">
+                  {review.title}
+                </h3>
+                <StarDisplay value={review.rating} className="mt-1 text-base" />
+                <p className="mt-3 text-sm text-slate-300">
+                  {review.excerpt}
+                </p>
+
+                <div className="mt-4 flex items-center justify-between text-sm text-slate-400">
+                  <span>{formatDate(review.created_at)}</span>
+                  <Link
+                    href={`/reviews/${review.slug}`}
+                    className="font-medium text-slate-100 underline-offset-2 hover:underline"
+                  >
+                    Ver reseña
+                  </Link>
+                </div>
+              </div>
+            </article>
+          ))}
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+
+        <div className="mt-8 text-center">
+          <Link href="/reviews" className="text-base underline">
+            Ver todas las reseñas
+          </Link>
         </div>
-      </main>
-    </div>
+      </section>
+
+      <section className="mt-16 rounded-xl border border-dashed border-slate-700 bg-slate-900 p-8 text-center">
+        <h2 className="text-xl font-semibold">Próximamente</h2>
+        <p className="mt-2 text-slate-300">
+          Este espacio queda reservado para nuevas secciones.
+        </p>
+      </section>
+    </Container>
   );
 }
