@@ -9,6 +9,7 @@ import { logAuthEvent } from "../../utils/auth/logger";
 import { isAdminUser } from "../../utils/auth/admin";
 import { slugify } from "../../utils/slug";
 import {
+  MAX_COVER_BYTES,
   parseReviewFormData,
   validateReviewFields,
 } from "../../utils/reviews/review-form-data";
@@ -26,7 +27,6 @@ export type UpdateReviewState = {
 };
 
 const COVERS_BUCKET = "review-covers";
-const MAX_COVER_BYTES = 5 * 1024 * 1024;
 
 const initialState: AuthActionState = {};
 

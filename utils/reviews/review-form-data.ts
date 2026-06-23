@@ -1,3 +1,5 @@
+export const MAX_COVER_BYTES = 5 * 1024 * 1024;
+
 export function parseReviewFormData(formData: FormData) {
   const title = String(formData.get("title") ?? "").trim();
   const slugInput = String(formData.get("slug") ?? "").trim();

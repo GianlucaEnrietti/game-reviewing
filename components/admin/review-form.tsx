@@ -5,6 +5,7 @@ import { Controller, useForm } from "react-hook-form";
 import { createReview, updateReview } from "../../app/admin/actions";
 import { Review } from "../../data/reviews";
 import { slugify } from "../../utils/slug";
+import { MAX_COVER_BYTES } from "../../utils/reviews/review-form-data";
 import StarRating from "./star-rating";
 import MarkdownEditor from "./markdown-editor";
 
@@ -82,6 +83,11 @@ export default function ReviewForm({ review }: Props) {
 
   async function onSubmit(values: FormValues) {
     setServerError(null);
+
+    if (values.cover && values.cover.length > 0 && values.cover[0].size > MAX_COVER_BYTES) {
+      setServerError("La portada no puede superar los 5MB.");
+      return;
+    }
 
     const formData = new FormData();
     formData.append("title", values.title);
@@ -198,6 +204,7 @@ export default function ReviewForm({ review }: Props) {
           className="block w-full text-sm text-slate-300 file:mr-3 file:rounded-md file:border-0 file:bg-slate-800 file:px-3 file:py-2 file:text-slate-100"
           {...register("cover")}
         />
+        <p className="mt-1 text-xs text-slate-400">Máximo 5 MB. Formatos de imagen habituales (JPG, PNG, WebP).</p>
         {coverPreview && (
           // eslint-disable-next-line @next/next/no-img-element
           <img
