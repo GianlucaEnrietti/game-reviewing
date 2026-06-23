@@ -19,7 +19,7 @@ export async function generateMetadata(
   }
 
   return {
-    title: `${review.title} | Game Reviews`,
+    title: review.title,
     description: review.excerpt,
     openGraph: {
       title: review.title,

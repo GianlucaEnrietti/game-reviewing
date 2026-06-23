@@ -13,7 +13,7 @@ import {
 } from "../../utils/news/pagination";
 
 export const metadata = {
-  title: "Noticias | Game Reviews",
+  title: "Noticias",
   description: "Noticias y novedades sobre videojuegos",
 };
 

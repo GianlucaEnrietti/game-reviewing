@@ -2,6 +2,7 @@ import "./globals.css";
 import Header from "../components/header";
 import Footer from "../components/footer";
 import InviteHashRedirect from "../components/auth/invite-hash-redirect";
+import { rootMetadata } from "../utils/site-metadata";
 import { Inter } from "next/font/google";
 
 const inter = Inter({
@@ -9,10 +10,7 @@ const inter = Inter({
   variable: "--font-inter",
 });
 
-export const metadata = {
-  title: "Game Reviews",
-  description: "Reseñas de videojuegos",
-};
+export const metadata = rootMetadata;
 
 export default function RootLayout({
   children,

@@ -1,7 +1,7 @@
 import Container from "../../components/container";
 
 export const metadata = {
-  title: "Sobre nosotros | Josticks",
+  title: "Sobre nosotros",
   description: "Conoce más sobre Josticks y nuestra misión.",
 };
 

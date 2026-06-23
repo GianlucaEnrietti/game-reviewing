@@ -9,7 +9,6 @@ import { getRandomReviews, RANDOM_REVIEWS_MAX } from "../utils/reviews/random-re
 import { getNewsTitle, newsExcerpt } from "../utils/news/format";
 
 export const metadata = {
-  title: "Game Reviews",
   description: "Reseñas, opiniones y noticias sobre videojuegos",
 };
 

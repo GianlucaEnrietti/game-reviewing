@@ -13,7 +13,7 @@ import {
 } from "../../utils/reviews/pagination";
 
 export const metadata = {
-  title: "Reviews | Game Reviews",
+  title: "Reseñas",
   description: "Listado de reseñas de videojuegos",
 };
 

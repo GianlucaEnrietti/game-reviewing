@@ -5,7 +5,7 @@ import { isAdminUser } from "../../../utils/auth/admin";
 import { signOut } from "../actions";
 
 export const metadata = {
-  title: "Panel | Game Reviews",
+  title: "Panel",
   robots: { index: false, follow: false },
 };
 

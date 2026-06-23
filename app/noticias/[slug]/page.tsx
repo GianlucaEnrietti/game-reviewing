@@ -19,7 +19,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const title = getNewsTitle(newsItem);
 
   return {
-    title: `${title} | Noticias`,
+    title,
     description: newsExcerpt(newsItem.content),
     openGraph: {
       title,

@@ -1,5 +1,7 @@
+import Image from "next/image";
 import Link from "next/link";
 import { createClient } from "../utils/supabase/server";
+import HeaderNavLinks from "./header-nav-links";
 import HeaderUserMenu from "./header-user-menu";
 
 export default async function Header() {
@@ -9,33 +11,25 @@ export default async function Header() {
 
   return (
     <header className="sticky top-0 z-50 border-b border-slate-800 bg-slate-950/95 backdrop-blur supports-[backdrop-filter]:bg-slate-950/80">
-      <nav className="mx-auto flex h-16 w-full max-w-6xl items-center justify-between px-4">
-        <div className="flex items-center gap-8">
-          <Link href="/" className="text-xl font-extrabold tracking-tight text-slate-100">
-            <span className="mr-2">🎮</span>
-            JOSTICKS
+      <nav className="relative mx-auto flex h-16 w-full max-w-6xl items-center px-4">
+        <div className="flex flex-1 items-center">
+          <Link href="/" className="shrink-0">
+            <Image
+              src="/userIcon.jpg"
+              alt="Josticks"
+              width={40}
+              height={40}
+              className="rounded-full"
+              priority
+            />
           </Link>
-
-          <div className="hidden items-center gap-6 text-sm font-medium md:flex">
-            <Link href="/" className="text-slate-200 hover:text-white">
-              INICIO
-            </Link>
-            <Link href="/reviews" className="text-slate-200 hover:text-white">
-              RESEÑAS
-            </Link>
-            <Link href="/noticias" className="text-slate-200 hover:text-white">
-              NOTICIAS
-            </Link>
-            <Link
-              href="/sobre-nosotros"
-              className="text-slate-200 hover:text-white"
-            >
-              SOBRE NOSOTROS
-            </Link>
-          </div>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="absolute left-1/2 -translate-x-1/2">
+          <HeaderNavLinks />
+        </div>
+
+        <div className="flex flex-1 items-center justify-end gap-3">
           {user && <HeaderUserMenu email={user.email} />}
         </div>
       </nav>
