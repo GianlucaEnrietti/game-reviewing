@@ -1,4 +1,6 @@
-export const MAX_COVER_BYTES = 5 * 1024 * 1024;
+import { MAX_COVER_BYTES } from "../storage/upload-cover";
+
+export { MAX_COVER_BYTES };
 
 export function parseReviewFormData(formData: FormData) {
   const title = String(formData.get("title") ?? "").trim();
@@ -6,6 +8,7 @@ export function parseReviewFormData(formData: FormData) {
   const excerpt = String(formData.get("excerpt") ?? "").trim();
   const content = String(formData.get("content") ?? "").trim();
   const finalThoughts = String(formData.get("finalThoughts") ?? "").trim();
+  const coverAlt = String(formData.get("coverAlt") ?? "").trim();
   const rating = Number(formData.get("rating") ?? 0);
   const genres = String(formData.get("genres") ?? "")
     .split(",")
@@ -13,7 +16,17 @@ export function parseReviewFormData(formData: FormData) {
     .filter(Boolean);
   const cover = formData.get("cover");
 
-  return { title, slugInput, excerpt, content, finalThoughts, rating, genres, cover };
+  return {
+    title,
+    slugInput,
+    excerpt,
+    content,
+    finalThoughts,
+    coverAlt,
+    rating,
+    genres,
+    cover,
+  };
 }
 
 export function validateReviewFields(

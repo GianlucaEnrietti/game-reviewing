@@ -8,8 +8,8 @@ import { verifyTurnstileToken } from "../../utils/security/turnstile";
 import { logAuthEvent } from "../../utils/auth/logger";
 import { isAdminUser } from "../../utils/auth/admin";
 import { slugify } from "../../utils/slug";
+import { uploadCoverImage } from "../../utils/storage/upload-cover";
 import {
-  MAX_COVER_BYTES,
   parseReviewFormData,
   validateReviewFields,
 } from "../../utils/reviews/review-form-data";
@@ -41,47 +41,6 @@ function getClientIp(headerList: Headers): string | null {
   }
 
   return forwardedFor.split(",")[0]?.trim() ?? null;
-}
-
-async function uploadCoverImage(
-  supabase: Awaited<ReturnType<typeof createClient>>,
-  cover: FormDataEntryValue | null,
-  slug: string
-): Promise<{ coverImage: string | null; error?: string }> {
-  if (!(cover instanceof File) || cover.size === 0) {
-    return { coverImage: null };
-  }
-
-  if (!cover.type.startsWith("image/")) {
-    return { coverImage: null, error: "El archivo de portada debe ser una imagen." };
-  }
-
-  if (cover.size > MAX_COVER_BYTES) {
-    return { coverImage: null, error: "La portada no puede superar los 5MB." };
-  }
-
-  const extension = cover.name.split(".").pop()?.toLowerCase() || "jpg";
-  const path = `${slug}-${Date.now()}.${extension}`;
-
-  const { error: uploadError } = await supabase.storage
-    .from(COVERS_BUCKET)
-    .upload(path, cover, {
-      contentType: cover.type,
-      upsert: false,
-    });
-
-  if (uploadError) {
-    return {
-      coverImage: null,
-      error: `Error al subir la portada: ${uploadError.message}`,
-    };
-  }
-
-  const { data: publicUrl } = supabase.storage
-    .from(COVERS_BUCKET)
-    .getPublicUrl(path);
-
-  return { coverImage: publicUrl.publicUrl };
 }
 
 function revalidateReviewPaths(slugs: string[]) {
@@ -288,7 +247,8 @@ export async function createReview(
   const { coverImage, error: uploadError } = await uploadCoverImage(
     supabase,
     fields.cover,
-    slug
+    slug,
+    COVERS_BUCKET
   );
 
   if (uploadError) {
@@ -302,6 +262,7 @@ export async function createReview(
     content: fields.content,
     rating: fields.rating,
     cover_image: coverImage,
+    cover_alt: fields.coverAlt || null,
     genres: fields.genres,
     author_id: user.id,
     final_thoughts: fields.finalThoughts,
@@ -362,7 +323,8 @@ export async function updateReview(
   const { coverImage, error: uploadError } = await uploadCoverImage(
     supabase,
     fields.cover,
-    slug
+    slug,
+    COVERS_BUCKET
   );
 
   if (uploadError) {
@@ -379,6 +341,7 @@ export async function updateReview(
       rating: fields.rating,
       genres: fields.genres,
       final_thoughts: fields.finalThoughts,
+      cover_alt: fields.coverAlt || null,
       ...(coverImage ? { cover_image: coverImage } : {}),
     })
     .eq("id", reviewId)

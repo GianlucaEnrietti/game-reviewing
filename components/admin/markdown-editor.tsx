@@ -1,8 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
-import ReactMarkdown from "react-markdown";
-import remarkGfm from "remark-gfm";
+import MarkdownContent from "../markdown-content";
 
 type Props = {
   value: string;
@@ -43,6 +42,25 @@ const actions: ToolbarAction[] = [
   },
 ];
 
+function insertEmbedUrl(
+  value: string,
+  selected: string,
+  start: number,
+  end: number,
+  promptLabel: string,
+  placeholder: string
+) {
+  const url = window.prompt(promptLabel, placeholder);
+
+  if (!url?.trim()) {
+    return null;
+  }
+
+  const embedLine = `\n${url.trim()}\n`;
+  const next = value.slice(0, start) + embedLine + value.slice(end);
+  return { next, cursor: start + embedLine.length };
+}
+
 export default function MarkdownEditor({ value, onChange }: Props) {
   const [tab, setTab] = useState<"write" | "preview">("write");
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -68,10 +86,50 @@ export default function MarkdownEditor({ value, onChange }: Props) {
     });
   }
 
+  function applyEmbed(type: "youtube" | "x") {
+    const textarea = textareaRef.current;
+    if (!textarea) {
+      return;
+    }
+
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const result =
+      type === "youtube"
+        ? insertEmbedUrl(
+            value,
+            "",
+            start,
+            end,
+            "URL del video de YouTube",
+            "https://www.youtube.com/watch?v="
+          )
+        : insertEmbedUrl(
+            value,
+            "",
+            start,
+            end,
+            "URL del post de X",
+            "https://x.com/usuario/status/"
+          );
+
+    if (!result) {
+      return;
+    }
+
+    onChange(result.next);
+
+    requestAnimationFrame(() => {
+      textarea.focus();
+      textarea.selectionStart = result.cursor;
+      textarea.selectionEnd = result.cursor;
+    });
+  }
+
   return (
     <div className="rounded-lg border border-slate-700 bg-slate-900">
-      <div className="flex items-center justify-between border-b border-slate-800 px-2 py-2">
-        <div className="flex items-center gap-1">
+      <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-800 px-2 py-2">
+        <div className="flex flex-wrap items-center gap-1">
           {actions.map((action) => (
             <button
               key={action.label}
@@ -83,6 +141,22 @@ export default function MarkdownEditor({ value, onChange }: Props) {
               {action.label}
             </button>
           ))}
+          <button
+            type="button"
+            title="Insertar video de YouTube"
+            onClick={() => applyEmbed("youtube")}
+            className="rounded px-2 py-1 text-sm text-slate-200 hover:bg-slate-800"
+          >
+            YT
+          </button>
+          <button
+            type="button"
+            title="Insertar post de X"
+            onClick={() => applyEmbed("x")}
+            className="rounded px-2 py-1 text-sm text-slate-200 hover:bg-slate-800"
+          >
+            X
+          </button>
         </div>
 
         <div className="flex items-center gap-1 text-sm">
@@ -123,7 +197,7 @@ export default function MarkdownEditor({ value, onChange }: Props) {
       ) : (
         <div className="prose prose-invert max-w-none px-4 py-4">
           {value.trim() ? (
-            <ReactMarkdown remarkPlugins={[remarkGfm]}>{value}</ReactMarkdown>
+            <MarkdownContent content={value} />
           ) : (
             <p className="text-slate-500">Nada para previsualizar todavía.</p>
           )}

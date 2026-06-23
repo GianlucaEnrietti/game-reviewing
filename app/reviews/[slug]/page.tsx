@@ -1,9 +1,8 @@
 import { notFound } from "next/navigation";
-import ReactMarkdown from "react-markdown";
-import remarkGfm from "remark-gfm";
 import { Metadata } from "next";
 import StarDisplay from "../../../components/star-display";
 import ReviewShareButtons from "../../../components/review-share-buttons";
+import MarkdownContent from "../../../components/markdown-content";
 import { getReviewBySlug } from "../../../utils/reviews/get-review-by-slug";
 import { getReviewShareUrl } from "../../../utils/reviews/share-url";
 
@@ -53,7 +52,7 @@ export default async function ReviewPage({ params }: Props) {
                 // eslint-disable-next-line @next/next/no-img-element
                 <img
                     src={review.cover_image}
-                    alt={review.title}
+                    alt={review.cover_alt || review.title}
                     className="mb-8 aspect-video w-full rounded-xl object-cover"
                 />
             )}
@@ -86,9 +85,7 @@ export default async function ReviewPage({ params }: Props) {
             </header>
 
             <article className="prose prose-lg prose-invert mt-8 max-w-none prose-headings:font-bold prose-a:text-cyan-300 prose-a:no-underline hover:prose-a:underline prose-strong:text-white prose-code:text-cyan-200">
-                <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                    {review.content}
-                </ReactMarkdown>
+                <MarkdownContent content={review.content} />
             </article>
 
             {(review.final_thoughts || review.rating > 0) && (

@@ -1,0 +1,32 @@
+import { MAX_COVER_BYTES } from "../storage/upload-cover";
+
+export { MAX_COVER_BYTES };
+
+export function parseNewsFormData(formData: FormData) {
+  const title = String(formData.get("title") ?? "").trim();
+  const slugInput = String(formData.get("slug") ?? "").trim();
+  const content = String(formData.get("content") ?? "").trim();
+  const coverAlt = String(formData.get("coverAlt") ?? "").trim();
+  const cover = formData.get("cover");
+
+  return { title, slugInput, content, coverAlt, cover };
+}
+
+export function validateNewsFields(
+  fields: ReturnType<typeof parseNewsFormData>,
+  slug: string
+): string | null {
+  if (!fields.title) {
+    return "El título es obligatorio.";
+  }
+
+  if (!slug) {
+    return "No se pudo generar un slug válido.";
+  }
+
+  if (!fields.content) {
+    return "El contenido es obligatorio.";
+  }
+
+  return null;
+}

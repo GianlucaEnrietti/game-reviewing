@@ -43,6 +43,18 @@ export default async function AdminPanelLayout({
             >
               Nueva reseña
             </Link>
+            <Link
+              href="/admin/noticias"
+              className="text-slate-200 hover:text-white"
+            >
+              Noticias
+            </Link>
+            <Link
+              href="/admin/nueva-noticia"
+              className="text-slate-200 hover:text-white"
+            >
+              Nueva noticia
+            </Link>
             <Link href="/" className="text-slate-400 hover:text-white">
               Ver sitio
             </Link>

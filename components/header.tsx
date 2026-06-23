@@ -23,6 +23,9 @@ export default async function Header() {
             <Link href="/reviews" className="text-slate-200 hover:text-white">
               RESEÑAS
             </Link>
+            <Link href="/noticias" className="text-slate-200 hover:text-white">
+              NOTICIAS
+            </Link>
             <Link
               href="/sobre-nosotros"
               className="text-slate-200 hover:text-white"

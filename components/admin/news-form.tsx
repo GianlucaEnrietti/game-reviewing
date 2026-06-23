@@ -2,35 +2,30 @@
 
 import { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
-import { createReview, updateReview } from "../../app/admin/actions";
-import { Review } from "../../data/reviews";
+import { createNews, updateNews } from "../../app/admin/news-actions";
+import { News } from "../../data/news";
 import { slugify } from "../../utils/slug";
-import { MAX_COVER_BYTES } from "../../utils/reviews/review-form-data";
-import StarRating from "./star-rating";
+import { MAX_COVER_BYTES } from "../../utils/news/news-form-data";
 import MarkdownEditor from "./markdown-editor";
 
 type FormValues = {
   title: string;
   slug: string;
-  excerpt: string;
-  genres: string;
-  rating: number;
   content: string;
-  finalThoughts: string;
   coverAlt: string;
   cover: FileList | null;
 };
 
 type Props = {
-  review?: Review;
+  newsItem?: News;
 };
 
 const inputClass =
   "w-full rounded-md border border-slate-700 bg-slate-900 px-3 py-2 text-slate-100 outline-none focus:border-slate-500";
 const labelClass = "mb-1 block text-sm font-medium text-slate-200";
 
-export default function ReviewForm({ review }: Props) {
-  const isEditing = Boolean(review);
+export default function NewsForm({ newsItem }: Props) {
+  const isEditing = Boolean(newsItem);
 
   const {
     register,
@@ -41,14 +36,10 @@ export default function ReviewForm({ review }: Props) {
     formState: { errors, isSubmitting },
   } = useForm<FormValues>({
     defaultValues: {
-      title: review?.title ?? "",
-      slug: review?.slug ?? "",
-      excerpt: review?.excerpt ?? "",
-      genres: review?.genres.join(", ") ?? "",
-      rating: review?.rating ?? 0,
-      content: review?.content ?? "",
-      finalThoughts: review?.final_thoughts ?? "",
-      coverAlt: review?.cover_alt ?? "",
+      title: newsItem?.title ?? "",
+      slug: newsItem?.slug ?? "",
+      content: newsItem?.content ?? "",
+      coverAlt: newsItem?.cover_alt ?? "",
       cover: null,
     },
   });
@@ -56,7 +47,7 @@ export default function ReviewForm({ review }: Props) {
   const [serverError, setServerError] = useState<string | null>(null);
   const [slugTouched, setSlugTouched] = useState(isEditing);
   const [coverPreview, setCoverPreview] = useState<string | null>(
-    review?.cover_image ?? null
+    newsItem?.cover_image ?? null
   );
 
   const title = watch("title");
@@ -75,13 +66,13 @@ export default function ReviewForm({ review }: Props) {
       return () => URL.revokeObjectURL(url);
     }
 
-    if (isEditing && review?.cover_image) {
-      setCoverPreview(review.cover_image);
+    if (isEditing && newsItem?.cover_image) {
+      setCoverPreview(newsItem.cover_image);
       return;
     }
 
     setCoverPreview(null);
-  }, [cover, isEditing, review?.cover_image]);
+  }, [cover, isEditing, newsItem?.cover_image]);
 
   async function onSubmit(values: FormValues) {
     setServerError(null);
@@ -94,24 +85,20 @@ export default function ReviewForm({ review }: Props) {
     const formData = new FormData();
     formData.append("title", values.title);
     formData.append("slug", values.slug);
-    formData.append("excerpt", values.excerpt);
-    formData.append("genres", values.genres);
-    formData.append("rating", String(values.rating));
     formData.append("content", values.content);
-    formData.append("finalThoughts", values.finalThoughts);
     formData.append("coverAlt", values.coverAlt);
 
     if (values.cover && values.cover.length > 0) {
       formData.append("cover", values.cover[0]);
     }
 
-    if (isEditing && review) {
-      formData.append("reviewId", review.id);
+    if (isEditing && newsItem) {
+      formData.append("newsId", newsItem.id);
     }
 
     const result = isEditing
-      ? await updateReview(formData)
-      : await createReview(formData);
+      ? await updateNews(formData)
+      : await createNews(formData);
 
     if (result?.error) {
       setServerError(result.error);
@@ -141,6 +128,7 @@ export default function ReviewForm({ review }: Props) {
         <input
           id="slug"
           className={inputClass}
+          placeholder="nueva-expansion-anunciada"
           {...register("slug", {
             required: "El slug es obligatorio.",
             onChange: () => setSlugTouched(true),
@@ -148,51 +136,6 @@ export default function ReviewForm({ review }: Props) {
         />
         {errors.slug && (
           <p className="mt-1 text-sm text-red-400">{errors.slug.message}</p>
-        )}
-      </div>
-
-      <div>
-        <label className={labelClass} htmlFor="excerpt">
-          Extracto
-        </label>
-        <input
-          id="excerpt"
-          className={inputClass}
-          {...register("excerpt", { required: "El extracto es obligatorio." })}
-        />
-        {errors.excerpt && (
-          <p className="mt-1 text-sm text-red-400">{errors.excerpt.message}</p>
-        )}
-      </div>
-
-      <div>
-        <label className={labelClass} htmlFor="genres">
-          Géneros (separados por coma)
-        </label>
-        <input
-          id="genres"
-          placeholder="RPG, Acción, Indie"
-          className={inputClass}
-          {...register("genres")}
-        />
-      </div>
-
-      <div>
-        <span className={labelClass}>Puntaje</span>
-        <Controller
-          control={control}
-          name="rating"
-          rules={{
-            validate: (value) =>
-              (value >= 0.5 && value <= 5) ||
-              "Selecciona un puntaje entre 0.5 y 5.",
-          }}
-          render={({ field }) => (
-            <StarRating value={field.value} onChange={field.onChange} />
-          )}
-        />
-        {errors.rating && (
-          <p className="mt-1 text-sm text-red-400">{errors.rating.message}</p>
         )}
       </div>
 
@@ -207,7 +150,9 @@ export default function ReviewForm({ review }: Props) {
           className="block w-full text-sm text-slate-300 file:mr-3 file:rounded-md file:border-0 file:bg-slate-800 file:px-3 file:py-2 file:text-slate-100"
           {...register("cover")}
         />
-        <p className="mt-1 text-xs text-slate-400">Máximo 5 MB. Formatos de imagen habituales (JPG, PNG, WebP).</p>
+        <p className="mt-1 text-xs text-slate-400">
+          Máximo 5 MB. Formatos de imagen habituales (JPG, PNG, WebP).
+        </p>
         {coverPreview && (
           // eslint-disable-next-line @next/next/no-img-element
           <img
@@ -234,7 +179,7 @@ export default function ReviewForm({ review }: Props) {
         <span className={labelClass}>Contenido (Markdown)</span>
         <p className="mb-2 text-xs text-slate-400">
           Para insertar YouTube o X, pegá la URL en una línea aparte o usá los
-          botones YT / X del editor.
+          botones del editor.
         </p>
         <Controller
           control={control}
@@ -246,26 +191,6 @@ export default function ReviewForm({ review }: Props) {
         />
         {errors.content && (
           <p className="mt-1 text-sm text-red-400">{errors.content.message}</p>
-        )}
-      </div>
-
-      <div>
-        <label className={labelClass} htmlFor="finalThoughts">
-          Pensamientos finales
-        </label>
-        <textarea
-          id="finalThoughts"
-          rows={4}
-          placeholder="Tu cierre personal sobre el juego..."
-          className={`${inputClass} resize-y`}
-          {...register("finalThoughts", {
-            required: "Los pensamientos finales son obligatorios.",
-          })}
-        />
-        {errors.finalThoughts && (
-          <p className="mt-1 text-sm text-red-400">
-            {errors.finalThoughts.message}
-          </p>
         )}
       </div>
 
@@ -284,7 +209,7 @@ export default function ReviewForm({ review }: Props) {
           ? "Guardando..."
           : isEditing
             ? "Guardar cambios"
-            : "Publicar reseña"}
+            : "Publicar noticia"}
       </button>
     </form>
   );
