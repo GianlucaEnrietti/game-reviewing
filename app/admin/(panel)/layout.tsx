@@ -49,6 +49,12 @@ export default async function AdminPanelLayout({
             >
               Rambles
             </Link>
+            <Link
+              href="/admin/comentarios"
+              className="text-slate-200 hover:text-white"
+            >
+              Comentarios
+            </Link>
             <Link href="/" className="text-slate-400 hover:text-white">
               Ver sitio
             </Link>

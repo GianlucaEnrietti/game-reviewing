@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { Metadata } from "next";
 import MarkdownContent from "../../../components/markdown-content";
+import CommentsSection from "../../../components/comments/comments-section";
 import { getNewsBySlug } from "../../../utils/news/get-news-by-slug";
 import { getNewsTitle, newsExcerpt } from "../../../utils/news/format";
 import { buildArticleShareMetadata } from "../../../utils/seo/article-metadata";
@@ -75,6 +76,8 @@ export default async function NewsDetailPage({ params }: Props) {
       <article className="prose prose-lg prose-invert mt-8 max-w-none prose-headings:font-bold prose-a:text-cyan-300 prose-a:no-underline hover:prose-a:underline prose-strong:text-white prose-code:text-cyan-200">
         <MarkdownContent content={newsItem.content} />
       </article>
+
+      <CommentsSection postSlug={slug} postType="news" />
     </main>
   );
 }

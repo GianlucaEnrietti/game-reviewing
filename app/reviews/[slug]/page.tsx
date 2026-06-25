@@ -3,6 +3,7 @@ import { Metadata } from "next";
 import StarDisplay from "../../../components/star-display";
 import ReviewShareButtons from "../../../components/review-share-buttons";
 import MarkdownContent from "../../../components/markdown-content";
+import CommentsSection from "../../../components/comments/comments-section";
 import { getReviewBySlug } from "../../../utils/reviews/get-review-by-slug";
 import { getReviewShareUrl } from "../../../utils/reviews/share-url";
 import { buildArticleShareMetadata } from "../../../utils/seo/article-metadata";
@@ -113,6 +114,8 @@ export default async function ReviewPage({ params }: Props) {
                     )}
                 </section>
             )}
+
+            <CommentsSection postSlug={slug} postType="review" />
 
         </main>
     );

@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { Metadata } from "next";
 import MarkdownContent from "../../../components/markdown-content";
+import CommentsSection from "../../../components/comments/comments-section";
 import { getRambleBySlug } from "../../../utils/rambles/get-ramble-by-slug";
 import {
   getRambleTitle,
@@ -78,6 +79,8 @@ export default async function RambleDetailPage({ params }: Props) {
       <article className="prose prose-lg prose-invert mt-8 max-w-none prose-headings:font-bold prose-a:text-cyan-300 prose-a:no-underline hover:prose-a:underline prose-strong:text-white prose-code:text-cyan-200">
         <MarkdownContent content={ramble.content} />
       </article>
+
+      <CommentsSection postSlug={slug} postType="opinion" />
     </main>
   );
 }
