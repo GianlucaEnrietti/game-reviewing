@@ -3,10 +3,12 @@ import Link from "next/link";
 import { createClient } from "../utils/supabase/server";
 import { Review } from "../data/reviews";
 import { News } from "../data/news";
+import { Ramble } from "../data/rambles";
 import StarDisplay from "../components/star-display";
 import RandomReviewsSlider from "../components/random-reviews-slider";
-import { getRandomReviews, RANDOM_REVIEWS_MAX } from "../utils/reviews/random-reviews";
+import { getRandomReviews } from "../utils/reviews/random-reviews";
 import { getNewsTitle, newsExcerpt } from "../utils/news/format";
+import { getRambleTitle, rambleExcerpt } from "../utils/rambles/format";
 
 export const metadata = {
   description: "Reseñas, opiniones y noticias sobre videojuegos",
@@ -27,6 +29,7 @@ export default async function Home() {
     { data: recentReviews, error },
     randomReviews,
     { data: recentNews, error: newsError },
+    { data: recentRambles, error: ramblesError },
   ] = await Promise.all([
     supabase
       .from("reviews")
@@ -41,6 +44,12 @@ export default async function Home() {
       .order("created_at", { ascending: false })
       .limit(3)
       .returns<News[]>(),
+    supabase
+      .from("rambles")
+      .select("*")
+      .order("created_at", { ascending: false })
+      .limit(3)
+      .returns<Ramble[]>(),
   ]);
 
   return (
@@ -90,6 +99,11 @@ export default async function Home() {
                 <h3 className="text-2xl font-semibold leading-tight">
                   {review.title}
                 </h3>
+                {review.subtitle && (
+                  <p className="mt-2 line-clamp-2 text-sm text-slate-300">
+                    {review.subtitle}
+                  </p>
+                )}
                 <StarDisplay value={review.rating} className="mt-1 text-base" />
                 <p className="mt-3 text-sm text-slate-300">
                   {review.excerpt}
@@ -150,6 +164,11 @@ export default async function Home() {
                 <h3 className="text-2xl font-semibold leading-tight">
                   {getNewsTitle(item)}
                 </h3>
+                {item.subtitle && (
+                  <p className="mt-2 line-clamp-2 text-sm text-slate-300">
+                    {item.subtitle}
+                  </p>
+                )}
                 <p className="mt-3 line-clamp-3 text-sm text-slate-300">
                   {newsExcerpt(item.content)}
                 </p>
@@ -177,6 +196,76 @@ export default async function Home() {
         <div className="mt-8 text-center">
           <Link href="/noticias" className="text-base underline">
             Ver todas las noticias
+          </Link>
+        </div>
+      </section>
+
+      <section className="mt-16">
+        <h2 className="text-xl font-semibold">Rambles recientes</h2>
+
+        {ramblesError && (
+          <p className="mt-4 text-sm text-red-400">
+            No se pudieron cargar los rambles en este momento.
+          </p>
+        )}
+
+        <div className="mt-5 grid gap-4 md:grid-cols-3">
+          {(recentRambles ?? []).map((item) => (
+            <article
+              key={item.id}
+              className="overflow-hidden rounded-xl border border-slate-800 bg-slate-900"
+            >
+              <div className="relative aspect-[16/9] w-full shrink-0 overflow-hidden bg-slate-800">
+                {item.cover_image ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={item.cover_image}
+                    alt={item.cover_alt || getRambleTitle(item)}
+                    className="absolute inset-0 h-full w-full object-cover object-center"
+                  />
+                ) : (
+                  <div className="absolute inset-0 flex items-center justify-center text-slate-400">
+                    Sin imagen
+                  </div>
+                )}
+              </div>
+
+              <div className="p-4">
+                <h3 className="text-2xl font-semibold leading-tight">
+                  {getRambleTitle(item)}
+                </h3>
+                {item.subtitle && (
+                  <p className="mt-2 line-clamp-2 text-sm text-slate-300">
+                    {item.subtitle}
+                  </p>
+                )}
+                <p className="mt-3 line-clamp-3 text-sm text-slate-300">
+                  {rambleExcerpt(item.content)}
+                </p>
+
+                <div className="mt-4 flex items-center justify-between text-sm text-slate-400">
+                  <span>{formatDate(item.created_at)}</span>
+                  <Link
+                    href={`/rambles/${item.slug}`}
+                    className="font-medium text-slate-100 underline-offset-2 hover:underline"
+                  >
+                    Leer ramble
+                  </Link>
+                </div>
+              </div>
+            </article>
+          ))}
+        </div>
+
+        {!ramblesError && (recentRambles ?? []).length === 0 && (
+          <p className="mt-4 text-sm text-slate-400">
+            Todavía no hay rambles publicados.
+          </p>
+        )}
+
+        <div className="mt-8 text-center">
+          <Link href="/rambles" className="text-base underline">
+            Ver todos los rambles
           </Link>
         </div>
       </section>

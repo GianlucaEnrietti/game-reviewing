@@ -1,20 +1,20 @@
 import Container from "../../components/container";
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { News } from "../../data/news";
+import { Ramble } from "../../data/rambles";
 import { createClient } from "../../utils/supabase/server";
-import NewsPagination from "../../components/news-pagination";
-import { getNewsTitle, newsExcerpt } from "../../utils/news/format";
+import RamblesPagination from "../../components/rambles-pagination";
+import { getRambleTitle, rambleExcerpt } from "../../utils/rambles/format";
 import {
   getTotalPages,
-  NEWS_PAGE_SIZE,
-  newsPageUrl,
-  parseNewsPage,
-} from "../../utils/news/pagination";
+  parseRamblesPage,
+  ramblesPageUrl,
+  RAMBLES_PAGE_SIZE,
+} from "../../utils/rambles/pagination";
 
 export const metadata = {
-  title: "Noticias",
-  description: "Noticias y novedades sobre videojuegos",
+  title: "Rambles",
+  description: "Opiniones, reflexiones y editoriales sobre videojuegos",
 };
 
 type Props = {
@@ -29,52 +29,56 @@ function formatDate(date: string) {
   });
 }
 
-export default async function NewsPage({ searchParams }: Props) {
+export default async function RamblesPage({ searchParams }: Props) {
   const { page: rawPage } = await searchParams;
-  const requestedPage = parseNewsPage(rawPage);
+  const requestedPage = parseRamblesPage(rawPage);
 
   const supabase = await createClient();
-  const from = (requestedPage - 1) * NEWS_PAGE_SIZE;
-  const to = from + NEWS_PAGE_SIZE - 1;
+  const from = (requestedPage - 1) * RAMBLES_PAGE_SIZE;
+  const to = from + RAMBLES_PAGE_SIZE - 1;
 
-  const { data: newsItems, error, count } = await supabase
-    .from("news")
+  const { data: rambles, error, count } = await supabase
+    .from("rambles")
     .select("*", { count: "exact" })
     .order("created_at", { ascending: false })
     .range(from, to)
-    .returns<News[]>();
+    .returns<Ramble[]>();
 
   const totalCount = count ?? 0;
   const totalPages = getTotalPages(totalCount);
   const currentPage = Math.min(requestedPage, totalPages);
 
   if (requestedPage > totalPages && totalCount > 0) {
-    redirect(newsPageUrl(totalPages));
+    redirect(ramblesPageUrl(totalPages));
   }
 
   return (
     <Container>
       <h1 className="text-center text-4xl font-extrabold tracking-tight md:text-6xl">
-        Noticias
+        Rambles
       </h1>
+
+      <p className="mt-4 text-center text-slate-400">
+        Opiniones y reflexiones personales sobre videojuegos.
+      </p>
 
       {error && (
         <p className="mt-4 text-sm text-red-400">
-          No se pudieron cargar las noticias en este momento.
+          No se pudieron cargar los rambles en este momento.
         </p>
       )}
 
       {!error && totalCount === 0 && (
         <p className="mt-8 text-center text-slate-400">
-          Todavía no hay noticias publicadas.
+          Todavía no hay rambles publicados.
         </p>
       )}
 
       <div className="mt-8 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
-        {(newsItems ?? []).map((item) => (
+        {(rambles ?? []).map((item) => (
           <Link
             key={item.id}
-            href={`/noticias/${item.slug}`}
+            href={`/rambles/${item.slug}`}
             className="group flex flex-col overflow-hidden rounded-xl border border-slate-800 bg-slate-900 transition hover:border-slate-600"
           >
             <div className="aspect-video w-full overflow-hidden bg-slate-800">
@@ -82,7 +86,7 @@ export default async function NewsPage({ searchParams }: Props) {
                 // eslint-disable-next-line @next/next/no-img-element
                 <img
                   src={item.cover_image}
-                  alt={item.cover_alt || getNewsTitle(item)}
+                  alt={item.cover_alt || getRambleTitle(item)}
                   className="h-full w-full object-cover transition duration-300 group-hover:scale-105"
                 />
               ) : (
@@ -94,7 +98,7 @@ export default async function NewsPage({ searchParams }: Props) {
 
             <div className="flex flex-1 flex-col p-4">
               <h2 className="line-clamp-2 text-xl font-bold leading-tight text-slate-100">
-                {getNewsTitle(item)}
+                {getRambleTitle(item)}
               </h2>
 
               {item.subtitle && (
@@ -104,7 +108,7 @@ export default async function NewsPage({ searchParams }: Props) {
               )}
 
               <p className="mt-2 line-clamp-3 text-sm text-slate-400">
-                {newsExcerpt(item.content)}
+                {rambleExcerpt(item.content)}
               </p>
 
               <span className="mt-auto pt-4 text-xs text-slate-500">
@@ -117,9 +121,9 @@ export default async function NewsPage({ searchParams }: Props) {
 
       {!error && totalCount > 0 && (
         <>
-          <NewsPagination currentPage={currentPage} totalPages={totalPages} />
+          <RamblesPagination currentPage={currentPage} totalPages={totalPages} />
           <p className="mt-4 text-center text-xs text-slate-500">
-            Página {currentPage} de {totalPages} · {totalCount} noticia
+            Página {currentPage} de {totalPages} · {totalCount} ramble
             {totalCount === 1 ? "" : "s"}
           </p>
         </>

@@ -2,7 +2,7 @@ import { MAX_COVER_BYTES } from "../storage/upload-cover";
 
 export { MAX_COVER_BYTES };
 
-export function parseNewsFormData(formData: FormData) {
+export function parseRambleFormData(formData: FormData) {
   const title = String(formData.get("title") ?? "").trim();
   const subtitle = String(formData.get("subtitle") ?? "").trim();
   const slugInput = String(formData.get("slug") ?? "").trim();
@@ -13,8 +13,8 @@ export function parseNewsFormData(formData: FormData) {
   return { title, subtitle, slugInput, content, coverAlt, cover };
 }
 
-export function validateNewsFields(
-  fields: ReturnType<typeof parseNewsFormData>,
+export function validateRambleFields(
+  fields: ReturnType<typeof parseRambleFormData>,
   slug: string
 ): string | null {
   if (!fields.title) {

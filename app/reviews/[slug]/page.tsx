@@ -21,7 +21,7 @@ export async function generateMetadata(
 
   return buildArticleShareMetadata({
     title: review.title,
-    description: review.excerpt,
+    description: review.subtitle || review.excerpt,
     pagePath: `/reviews/${slug}`,
     coverImage: review.cover_image,
     imageAlt: review.cover_alt || review.title,
@@ -60,6 +60,12 @@ export default async function ReviewPage({ params }: Props) {
                 <h1 className="text-3xl font-bold">
                     {review.title}
                 </h1>
+
+                {review.subtitle && (
+                    <p className="mt-2 text-lg text-slate-300">
+                        {review.subtitle}
+                    </p>
+                )}
 
                 {review.author?.nickname && (
                     <p className="mt-2 text-sm text-slate-400">

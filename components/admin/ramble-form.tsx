@@ -2,10 +2,10 @@
 
 import { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
-import { createNews, updateNews } from "../../app/admin/news-actions";
-import { News } from "../../data/news";
+import { createRamble, updateRamble } from "../../app/admin/rambles-actions";
+import { Ramble } from "../../data/rambles";
 import { slugify } from "../../utils/slug";
-import { MAX_COVER_BYTES } from "../../utils/news/news-form-data";
+import { MAX_COVER_BYTES } from "../../utils/rambles/ramble-form-data";
 import MarkdownEditor from "./markdown-editor";
 
 type FormValues = {
@@ -18,15 +18,15 @@ type FormValues = {
 };
 
 type Props = {
-  newsItem?: News;
+  ramble?: Ramble;
 };
 
 const inputClass =
   "w-full rounded-md border border-slate-700 bg-slate-900 px-3 py-2 text-slate-100 outline-none focus:border-slate-500";
 const labelClass = "mb-1 block text-sm font-medium text-slate-200";
 
-export default function NewsForm({ newsItem }: Props) {
-  const isEditing = Boolean(newsItem);
+export default function RambleForm({ ramble }: Props) {
+  const isEditing = Boolean(ramble);
 
   const {
     register,
@@ -37,11 +37,11 @@ export default function NewsForm({ newsItem }: Props) {
     formState: { errors, isSubmitting },
   } = useForm<FormValues>({
     defaultValues: {
-      title: newsItem?.title ?? "",
-      subtitle: newsItem?.subtitle ?? "",
-      slug: newsItem?.slug ?? "",
-      content: newsItem?.content ?? "",
-      coverAlt: newsItem?.cover_alt ?? "",
+      title: ramble?.title ?? "",
+      subtitle: ramble?.subtitle ?? "",
+      slug: ramble?.slug ?? "",
+      content: ramble?.content ?? "",
+      coverAlt: ramble?.cover_alt ?? "",
       cover: null,
     },
   });
@@ -49,7 +49,7 @@ export default function NewsForm({ newsItem }: Props) {
   const [serverError, setServerError] = useState<string | null>(null);
   const [slugTouched, setSlugTouched] = useState(isEditing);
   const [coverPreview, setCoverPreview] = useState<string | null>(
-    newsItem?.cover_image ?? null
+    ramble?.cover_image ?? null
   );
 
   const title = watch("title");
@@ -68,13 +68,13 @@ export default function NewsForm({ newsItem }: Props) {
       return () => URL.revokeObjectURL(url);
     }
 
-    if (isEditing && newsItem?.cover_image) {
-      setCoverPreview(newsItem.cover_image);
+    if (isEditing && ramble?.cover_image) {
+      setCoverPreview(ramble.cover_image);
       return;
     }
 
     setCoverPreview(null);
-  }, [cover, isEditing, newsItem?.cover_image]);
+  }, [cover, isEditing, ramble?.cover_image]);
 
   async function onSubmit(values: FormValues) {
     setServerError(null);
@@ -95,13 +95,13 @@ export default function NewsForm({ newsItem }: Props) {
       formData.append("cover", values.cover[0]);
     }
 
-    if (isEditing && newsItem) {
-      formData.append("newsId", newsItem.id);
+    if (isEditing && ramble) {
+      formData.append("rambleId", ramble.id);
     }
 
     const result = isEditing
-      ? await updateNews(formData)
-      : await createNews(formData);
+      ? await updateRamble(formData)
+      : await createRamble(formData);
 
     if (result?.error) {
       setServerError(result.error);
@@ -142,7 +142,7 @@ export default function NewsForm({ newsItem }: Props) {
         <input
           id="slug"
           className={inputClass}
-          placeholder="nueva-expansion-anunciada"
+          placeholder="opiniones-sobre-la-generacion-actual"
           {...register("slug", {
             required: "El slug es obligatorio.",
             onChange: () => setSlugTouched(true),
@@ -223,7 +223,7 @@ export default function NewsForm({ newsItem }: Props) {
           ? "Guardando..."
           : isEditing
             ? "Guardar cambios"
-            : "Publicar noticia"}
+            : "Publicar ramble"}
       </button>
     </form>
   );

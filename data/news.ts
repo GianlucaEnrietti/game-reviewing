@@ -2,6 +2,7 @@ export type News = {
   id: string;
   created_at: string;
   title: string;
+  subtitle: string | null;
   slug: string;
   content: string;
   cover_image: string | null;

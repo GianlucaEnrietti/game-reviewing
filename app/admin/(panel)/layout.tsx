@@ -38,22 +38,16 @@ export default async function AdminPanelLayout({
               Reseñas
             </Link>
             <Link
-              href="/admin/nueva-resena"
-              className="text-slate-200 hover:text-white"
-            >
-              Nueva reseña
-            </Link>
-            <Link
               href="/admin/noticias"
               className="text-slate-200 hover:text-white"
             >
               Noticias
             </Link>
             <Link
-              href="/admin/nueva-noticia"
+              href="/admin/rambles"
               className="text-slate-200 hover:text-white"
             >
-              Nueva noticia
+              Rambles
             </Link>
             <Link href="/" className="text-slate-400 hover:text-white">
               Ver sitio

@@ -7,32 +7,32 @@ import { isAdminUser } from "../../utils/auth/admin";
 import { slugify } from "../../utils/slug";
 import { uploadCoverImage } from "../../utils/storage/upload-cover";
 import {
-  parseNewsFormData,
-  validateNewsFields,
-} from "../../utils/news/news-form-data";
+  parseRambleFormData,
+  validateRambleFields,
+} from "../../utils/rambles/ramble-form-data";
 
-export type NewsActionState = {
+export type RambleActionState = {
   error?: string;
 };
 
-const NEWS_COVERS_BUCKET = "news-covers";
+const RAMBLE_COVERS_BUCKET = "ramble-covers";
 
-function revalidateNewsPaths(slugs: string[]) {
-  revalidatePath("/admin/noticias");
+function revalidateRamblePaths(slugs: string[]) {
+  revalidatePath("/admin/rambles");
 
   for (const slug of slugs) {
     if (slug) {
-      revalidatePath(`/noticias/${slug}`);
+      revalidatePath(`/rambles/${slug}`);
     }
   }
 
-  revalidatePath("/noticias");
+  revalidatePath("/rambles");
   revalidatePath("/");
 }
 
-export async function createNews(
+export async function createRamble(
   formData: FormData
-): Promise<NewsActionState> {
+): Promise<RambleActionState> {
   const supabase = await createClient();
   const {
     data: { user },
@@ -42,11 +42,11 @@ export async function createNews(
     return { error: "No autorizado." };
   }
 
-  const fields = parseNewsFormData(formData);
+  const fields = parseRambleFormData(formData);
   const slug = fields.slugInput
     ? slugify(fields.slugInput)
     : slugify(fields.title);
-  const validationError = validateNewsFields(fields, slug);
+  const validationError = validateRambleFields(fields, slug);
 
   if (validationError) {
     return { error: validationError };
@@ -56,14 +56,14 @@ export async function createNews(
     supabase,
     fields.cover,
     slug,
-    NEWS_COVERS_BUCKET
+    RAMBLE_COVERS_BUCKET
   );
 
   if (uploadError) {
     return { error: uploadError };
   }
 
-  const { error: insertError } = await supabase.from("news").insert({
+  const { error: insertError } = await supabase.from("rambles").insert({
     title: fields.title,
     subtitle: fields.subtitle || null,
     slug,
@@ -75,19 +75,19 @@ export async function createNews(
 
   if (insertError) {
     if (insertError.code === "23505") {
-      return { error: "Ya existe una noticia con ese slug." };
+      return { error: "Ya existe un ramble con ese slug." };
     }
 
     return { error: insertError.message };
   }
 
-  revalidateNewsPaths([slug]);
-  redirect("/admin/noticias");
+  revalidateRamblePaths([slug]);
+  redirect("/admin/rambles");
 }
 
-export async function updateNews(
+export async function updateRamble(
   formData: FormData
-): Promise<NewsActionState> {
+): Promise<RambleActionState> {
   const supabase = await createClient();
   const {
     data: { user },
@@ -97,31 +97,31 @@ export async function updateNews(
     return { error: "No autorizado." };
   }
 
-  const newsId = String(formData.get("newsId") ?? "").trim();
+  const rambleId = String(formData.get("rambleId") ?? "").trim();
 
-  if (!newsId) {
-    return { error: "Noticia no válida." };
+  if (!rambleId) {
+    return { error: "Ramble no válido." };
   }
 
   const { data: existing, error: fetchError } = await supabase
-    .from("news")
+    .from("rambles")
     .select("*")
-    .eq("id", newsId)
+    .eq("id", rambleId)
     .maybeSingle();
 
   if (fetchError || !existing) {
-    return { error: "Noticia no encontrada." };
+    return { error: "Ramble no encontrado." };
   }
 
   if (existing.author_id !== user.id) {
-    return { error: "Solo puedes editar noticias que hayas publicado." };
+    return { error: "Solo puedes editar rambles que hayas publicado." };
   }
 
-  const fields = parseNewsFormData(formData);
+  const fields = parseRambleFormData(formData);
   const slug = fields.slugInput
     ? slugify(fields.slugInput)
     : slugify(fields.title);
-  const validationError = validateNewsFields(fields, slug);
+  const validationError = validateRambleFields(fields, slug);
 
   if (validationError) {
     return { error: validationError };
@@ -131,7 +131,7 @@ export async function updateNews(
     supabase,
     fields.cover,
     slug,
-    NEWS_COVERS_BUCKET
+    RAMBLE_COVERS_BUCKET
   );
 
   if (uploadError) {
@@ -139,7 +139,7 @@ export async function updateNews(
   }
 
   const { error: updateError } = await supabase
-    .from("news")
+    .from("rambles")
     .update({
       title: fields.title,
       subtitle: fields.subtitle || null,
@@ -148,22 +148,24 @@ export async function updateNews(
       cover_alt: fields.coverAlt || null,
       ...(coverImage ? { cover_image: coverImage } : {}),
     })
-    .eq("id", newsId)
+    .eq("id", rambleId)
     .eq("author_id", user.id);
 
   if (updateError) {
     if (updateError.code === "23505") {
-      return { error: "Ya existe una noticia con ese slug." };
+      return { error: "Ya existe un ramble con ese slug." };
     }
 
     return { error: updateError.message };
   }
 
-  revalidateNewsPaths([existing.slug as string, slug]);
-  redirect("/admin/noticias");
+  revalidateRamblePaths([existing.slug as string, slug]);
+  redirect("/admin/rambles");
 }
 
-export async function deleteNews(newsId: string): Promise<NewsActionState> {
+export async function deleteRamble(
+  rambleId: string
+): Promise<RambleActionState> {
   const supabase = await createClient();
   const {
     data: { user },
@@ -173,24 +175,24 @@ export async function deleteNews(newsId: string): Promise<NewsActionState> {
     return { error: "No autorizado." };
   }
 
-  if (!newsId) {
-    return { error: "Noticia no válida." };
+  if (!rambleId) {
+    return { error: "Ramble no válido." };
   }
 
   const { data: existing, error: fetchError } = await supabase
-    .from("news")
+    .from("rambles")
     .select("slug")
-    .eq("id", newsId)
+    .eq("id", rambleId)
     .maybeSingle<{ slug: string }>();
 
   if (fetchError || !existing) {
-    return { error: "Noticia no encontrada." };
+    return { error: "Ramble no encontrado." };
   }
 
   const { data: deleted, error: deleteError } = await supabase
-    .from("news")
+    .from("rambles")
     .delete()
-    .eq("id", newsId)
+    .eq("id", rambleId)
     .eq("author_id", user.id)
     .select("id")
     .maybeSingle();
@@ -200,9 +202,9 @@ export async function deleteNews(newsId: string): Promise<NewsActionState> {
   }
 
   if (!deleted) {
-    return { error: "Solo puedes eliminar noticias que hayas publicado." };
+    return { error: "Solo puedes eliminar rambles que hayas publicado." };
   }
 
-  revalidateNewsPaths([existing.slug]);
-  redirect("/admin/noticias");
+  revalidateRamblePaths([existing.slug]);
+  redirect("/admin/rambles");
 }

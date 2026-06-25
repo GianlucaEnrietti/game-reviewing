@@ -11,6 +11,7 @@ import MarkdownEditor from "./markdown-editor";
 
 type FormValues = {
   title: string;
+  subtitle: string;
   slug: string;
   excerpt: string;
   genres: string;
@@ -42,6 +43,7 @@ export default function ReviewForm({ review }: Props) {
   } = useForm<FormValues>({
     defaultValues: {
       title: review?.title ?? "",
+      subtitle: review?.subtitle ?? "",
       slug: review?.slug ?? "",
       excerpt: review?.excerpt ?? "",
       genres: review?.genres.join(", ") ?? "",
@@ -93,6 +95,7 @@ export default function ReviewForm({ review }: Props) {
 
     const formData = new FormData();
     formData.append("title", values.title);
+    formData.append("subtitle", values.subtitle);
     formData.append("slug", values.slug);
     formData.append("excerpt", values.excerpt);
     formData.append("genres", values.genres);
@@ -132,6 +135,17 @@ export default function ReviewForm({ review }: Props) {
         {errors.title && (
           <p className="mt-1 text-sm text-red-400">{errors.title.message}</p>
         )}
+      </div>
+
+      <div>
+        <label className={labelClass} htmlFor="subtitle">
+          Subtítulo (opcional)
+        </label>
+        <input
+          id="subtitle"
+          className={inputClass}
+          {...register("subtitle")}
+        />
       </div>
 
       <div>

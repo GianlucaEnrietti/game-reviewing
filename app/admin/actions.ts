@@ -257,6 +257,7 @@ export async function createReview(
 
   const { error: insertError } = await supabase.from("reviews").insert({
     title: fields.title,
+    subtitle: fields.subtitle || null,
     slug,
     excerpt: fields.excerpt,
     content: fields.content,
@@ -335,6 +336,7 @@ export async function updateReview(
     .from("reviews")
     .update({
       title: fields.title,
+      subtitle: fields.subtitle || null,
       slug,
       excerpt: fields.excerpt,
       content: fields.content,

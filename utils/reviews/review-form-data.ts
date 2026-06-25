@@ -4,6 +4,7 @@ export { MAX_COVER_BYTES };
 
 export function parseReviewFormData(formData: FormData) {
   const title = String(formData.get("title") ?? "").trim();
+  const subtitle = String(formData.get("subtitle") ?? "").trim();
   const slugInput = String(formData.get("slug") ?? "").trim();
   const excerpt = String(formData.get("excerpt") ?? "").trim();
   const content = String(formData.get("content") ?? "").trim();
@@ -18,6 +19,7 @@ export function parseReviewFormData(formData: FormData) {
 
   return {
     title,
+    subtitle,
     slugInput,
     excerpt,
     content,

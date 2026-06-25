@@ -106,6 +106,12 @@ export default async function ReviewsPage({ searchParams }: Props) {
                 {review.title}
               </h2>
 
+              {review.subtitle && (
+                <p className="mt-2 line-clamp-2 text-sm text-slate-300">
+                  {review.subtitle}
+                </p>
+              )}
+
               <p className="mt-2 line-clamp-2 text-sm text-slate-400">
                 {review.excerpt}
               </p>
