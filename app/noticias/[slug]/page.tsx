@@ -3,6 +3,7 @@ import { Metadata } from "next";
 import MarkdownContent from "../../../components/markdown-content";
 import { getNewsBySlug } from "../../../utils/news/get-news-by-slug";
 import { getNewsTitle, newsExcerpt } from "../../../utils/news/format";
+import { toAbsoluteUrl } from "../../../utils/seo/absolute-url";
 
 type Props = {
   params: Promise<{ slug: string }>;
@@ -17,14 +18,34 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   }
 
   const title = getNewsTitle(newsItem);
+  const description = newsExcerpt(newsItem.content);
+  const pageUrl = await toAbsoluteUrl(`/noticias/${slug}`);
+  const openGraphImage = newsItem.cover_image
+    ? await toAbsoluteUrl(newsItem.cover_image)
+    : null;
 
   return {
     title,
-    description: newsExcerpt(newsItem.content),
+    description,
     openGraph: {
+      url: pageUrl,
       title,
-      description: newsExcerpt(newsItem.content),
+      description,
       type: "article",
+      images: openGraphImage
+        ? [
+            {
+              url: openGraphImage,
+              alt: newsItem.cover_alt || title,
+            },
+          ]
+        : undefined,
+    },
+    twitter: {
+      card: openGraphImage ? "summary_large_image" : "summary",
+      title,
+      description,
+      images: openGraphImage ? [openGraphImage] : undefined,
     },
   };
 }

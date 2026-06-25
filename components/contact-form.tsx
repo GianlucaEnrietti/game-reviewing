@@ -19,6 +19,8 @@ export default function ContactForm() {
     initialState
   );
   const turnstileSiteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
+  const shouldUseTurnstile =
+    Boolean(turnstileSiteKey) && process.env.NODE_ENV !== "development";
 
   if (state.success) {
     return (
@@ -104,7 +106,7 @@ export default function ContactForm() {
         />
       </div>
 
-      {turnstileSiteKey && (
+      {shouldUseTurnstile && (
         <TurnstileField onTokenChange={setCaptchaToken} />
       )}
 
@@ -112,7 +114,7 @@ export default function ContactForm() {
 
       <button
         type="submit"
-        disabled={isPending || (Boolean(turnstileSiteKey) && !captchaToken)}
+        disabled={isPending || (shouldUseTurnstile && !captchaToken)}
         className="rounded-md bg-slate-100 px-5 py-2.5 text-sm font-semibold text-slate-900 hover:bg-white disabled:opacity-60"
       >
         {isPending ? "Enviando..." : "Enviar"}

@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { createClient } from "../utils/supabase/server";
+import HeaderMobileMenu from "./header-mobile-menu";
 import HeaderNavLinks from "./header-nav-links";
 import HeaderUserMenu from "./header-user-menu";
 
@@ -15,10 +16,10 @@ export default async function Header() {
         <div className="flex flex-1 items-center">
           <Link href="/" className="shrink-0">
             <Image
-              src="/userIcon.jpg"
-              alt="Josticks"
-              width={40}
-              height={40}
+              src="/vn-icon.png"
+              alt="Vicios y Noticias"
+              width={60}
+              height={60}
               className="rounded-full"
               priority
             />
@@ -30,6 +31,7 @@ export default async function Header() {
         </div>
 
         <div className="flex flex-1 items-center justify-end gap-3">
+          <HeaderMobileMenu />
           {user && <HeaderUserMenu email={user.email} />}
         </div>
       </nav>

@@ -15,6 +15,10 @@ export async function verifyTurnstileToken(
   token: string,
   remoteIp?: string
 ): Promise<TurnstileVerificationResult> {
+  if (process.env.NODE_ENV === "development") {
+    return { ok: true, reason: "captcha_disabled_local" };
+  }
+
   const siteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
   const secretKey = process.env.TURNSTILE_SECRET_KEY;
 

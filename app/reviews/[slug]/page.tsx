@@ -5,6 +5,7 @@ import ReviewShareButtons from "../../../components/review-share-buttons";
 import MarkdownContent from "../../../components/markdown-content";
 import { getReviewBySlug } from "../../../utils/reviews/get-review-by-slug";
 import { getReviewShareUrl } from "../../../utils/reviews/share-url";
+import { toAbsoluteUrl } from "../../../utils/seo/absolute-url";
 
 export async function generateMetadata(
   { params }: { params: Promise<{ slug: string }> }
@@ -18,13 +19,33 @@ export async function generateMetadata(
     };
   }
 
+  const pageUrl = await toAbsoluteUrl(`/reviews/${slug}`);
+  const openGraphImage = review.cover_image
+    ? await toAbsoluteUrl(review.cover_image)
+    : null;
+
   return {
     title: review.title,
     description: review.excerpt,
     openGraph: {
+      url: pageUrl,
       title: review.title,
       description: review.excerpt,
       type: "article",
+      images: openGraphImage
+        ? [
+            {
+              url: openGraphImage,
+              alt: review.cover_alt || review.title,
+            },
+          ]
+        : undefined,
+    },
+    twitter: {
+      card: openGraphImage ? "summary_large_image" : "summary",
+      title: review.title,
+      description: review.excerpt,
+      images: openGraphImage ? [openGraphImage] : undefined,
     },
   };
 }

@@ -2,7 +2,7 @@ import Container from "../../components/container";
 
 export const metadata = {
   title: "Sobre nosotros",
-  description: "Conoce más sobre Josticks y nuestra misión.",
+  description: "Conoce más sobre Vicios y Noticias.",
 };
 
 export default function AboutPage() {
@@ -15,22 +15,15 @@ export default function AboutPage() {
 
         <div className="mt-8 space-y-4 text-lg leading-relaxed text-slate-300">
           <p>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do
-            eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim
-            ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut
-            aliquip ex ea commodo consequat.
+            Vicios y Noticias es un pequeño proyecto hecho por y para amantes a los videojuegos, completamente gratuito y sin publicidad.
+            <br />
+            Actualmente, contamos con un minimo equipo para generar contenido y la web sigue en constanste desarrollo.
+            <br />
+            Si tienes alguna sugerencia o quieres colaborar, no dudes en contactarnos.
+            <br />
           </p>
           <p>
-            Duis aute irure dolor in reprehenderit in voluptate velit esse
-            cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat
-            cupidatat non proident, sunt in culpa qui officia deserunt mollit
-            anim id est laborum.
-          </p>
-          <p>
-            Curabitur pretium tincidunt lacus. Nulla gravida orci a odio. Nullam
-            varius, turpis et commodo pharetra, est eros bibendum elit, nec
-            luctus magna felis sollicitudin mauris. Integer in mauris eu nibh
-            euismod gravida.
+            Si quieres saber más sobre nosotros, puedes contactarnos a través de nuestras redes sociales.
           </p>
         </div>
       </section>

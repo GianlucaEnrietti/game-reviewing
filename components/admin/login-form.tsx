@@ -13,6 +13,8 @@ export default function AdminLoginForm() {
     initialState
   );
   const turnstileSiteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
+  const shouldUseTurnstile =
+    Boolean(turnstileSiteKey) && process.env.NODE_ENV !== "development";
 
   return (
     <form action={formAction} className="mt-6 space-y-4">
@@ -52,7 +54,7 @@ export default function AdminLoginForm() {
         />
       </div>
 
-      {turnstileSiteKey && (
+      {shouldUseTurnstile && (
         <TurnstileField onTokenChange={setCaptchaToken} />
       )}
 
@@ -60,7 +62,7 @@ export default function AdminLoginForm() {
 
       <button
         type="submit"
-        disabled={isPending || (Boolean(turnstileSiteKey) && !captchaToken)}
+        disabled={isPending || (shouldUseTurnstile && !captchaToken)}
         className="w-full rounded-md bg-slate-100 px-4 py-2 text-sm font-semibold text-slate-900 hover:bg-white disabled:opacity-60"
       >
         {isPending ? "Verificando..." : "Ingresar"}

@@ -46,8 +46,8 @@ export default async function Home() {
   return (
     <Container>
       <section className="pt-8">
-        <h1 className="max-w-4xl text-4xl font-extrabold tracking-tight md:text-6xl">
-          Reseñas de videojuegos simples y personales.
+        <h1 className="max-w-4xl text-4xl font-extrabold tracking-tight md:text-6xl underline">
+          Vicios y Noticias
         </h1>
 
         <p className="mt-5 max-w-3xl text-lg text-slate-300">
