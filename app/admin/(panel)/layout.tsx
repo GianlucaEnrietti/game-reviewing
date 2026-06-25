@@ -55,6 +55,12 @@ export default async function AdminPanelLayout({
             >
               Comentarios
             </Link>
+            <Link
+              href="/admin/destacado"
+              className="text-slate-200 hover:text-white"
+            >
+              Destacado
+            </Link>
             <Link href="/" className="text-slate-400 hover:text-white">
               Ver sitio
             </Link>

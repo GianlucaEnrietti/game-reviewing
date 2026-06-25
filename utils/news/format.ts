@@ -11,6 +11,18 @@ export function getNewsTitle(news: { title?: string | null; slug: string }): str
   return title || formatSlugAsTitle(news.slug);
 }
 
+export function getNewsExcerpt(
+  news: { excerpt?: string | null; content: string },
+  maxLength = 160
+): string {
+  const excerpt = news.excerpt?.trim();
+  if (excerpt) {
+    return excerpt;
+  }
+
+  return newsExcerpt(news.content, maxLength);
+}
+
 export function newsExcerpt(content: string, maxLength = 160): string {
   const plain = content
     .replace(/!\[[^\]]*\]\([^)]+\)/g, "")

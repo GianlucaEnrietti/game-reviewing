@@ -4,7 +4,7 @@ import { redirect } from "next/navigation";
 import { News } from "../../data/news";
 import { createClient } from "../../utils/supabase/server";
 import NewsPagination from "../../components/news-pagination";
-import { getNewsTitle, newsExcerpt } from "../../utils/news/format";
+import { getNewsTitle, getNewsExcerpt } from "../../utils/news/format";
 import {
   getTotalPages,
   NEWS_PAGE_SIZE,
@@ -104,7 +104,7 @@ export default async function NewsPage({ searchParams }: Props) {
               )}
 
               <p className="mt-2 line-clamp-3 text-sm text-slate-400">
-                {newsExcerpt(item.content)}
+                {getNewsExcerpt(item)}
               </p>
 
               <span className="mt-auto pt-4 text-xs text-slate-500">

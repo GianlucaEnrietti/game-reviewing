@@ -11,6 +11,7 @@ import MarkdownEditor from "./markdown-editor";
 type FormValues = {
   title: string;
   subtitle: string;
+  excerpt: string;
   slug: string;
   content: string;
   coverAlt: string;
@@ -39,6 +40,7 @@ export default function NewsForm({ newsItem }: Props) {
     defaultValues: {
       title: newsItem?.title ?? "",
       subtitle: newsItem?.subtitle ?? "",
+      excerpt: newsItem?.excerpt ?? "",
       slug: newsItem?.slug ?? "",
       content: newsItem?.content ?? "",
       coverAlt: newsItem?.cover_alt ?? "",
@@ -87,6 +89,7 @@ export default function NewsForm({ newsItem }: Props) {
     const formData = new FormData();
     formData.append("title", values.title);
     formData.append("subtitle", values.subtitle);
+    formData.append("excerpt", values.excerpt);
     formData.append("slug", values.slug);
     formData.append("content", values.content);
     formData.append("coverAlt", values.coverAlt);
@@ -133,6 +136,20 @@ export default function NewsForm({ newsItem }: Props) {
           className={inputClass}
           {...register("subtitle")}
         />
+      </div>
+
+      <div>
+        <label className={labelClass} htmlFor="excerpt">
+          Extracto
+        </label>
+        <input
+          id="excerpt"
+          className={inputClass}
+          {...register("excerpt", { required: "El extracto es obligatorio." })}
+        />
+        {errors.excerpt && (
+          <p className="mt-1 text-sm text-red-400">{errors.excerpt.message}</p>
+        )}
       </div>
 
       <div>

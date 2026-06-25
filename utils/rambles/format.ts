@@ -11,6 +11,18 @@ export function getRambleTitle(ramble: { title?: string | null; slug: string }):
   return title || formatSlugAsTitle(ramble.slug);
 }
 
+export function getRambleExcerpt(
+  ramble: { excerpt?: string | null; content: string },
+  maxLength = 160
+): string {
+  const excerpt = ramble.excerpt?.trim();
+  if (excerpt) {
+    return excerpt;
+  }
+
+  return rambleExcerpt(ramble.content, maxLength);
+}
+
 export function rambleExcerpt(content: string, maxLength = 160): string {
   const plain = content
     .replace(/!\[[^\]]*\]\([^)]+\)/g, "")

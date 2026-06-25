@@ -5,7 +5,7 @@ import CommentsSection from "../../../components/comments/comments-section";
 import { getRambleBySlug } from "../../../utils/rambles/get-ramble-by-slug";
 import {
   getRambleTitle,
-  rambleExcerpt,
+  getRambleExcerpt,
 } from "../../../utils/rambles/format";
 import { buildArticleShareMetadata } from "../../../utils/seo/article-metadata";
 
@@ -22,7 +22,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   }
 
   const title = getRambleTitle(ramble);
-  const description = ramble.subtitle || rambleExcerpt(ramble.content);
+  const description = ramble.subtitle || getRambleExcerpt(ramble);
 
   return buildArticleShareMetadata({
     title,

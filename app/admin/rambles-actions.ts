@@ -66,6 +66,7 @@ export async function createRamble(
   const { error: insertError } = await supabase.from("rambles").insert({
     title: fields.title,
     subtitle: fields.subtitle || null,
+    excerpt: fields.excerpt,
     slug,
     content: fields.content,
     cover_image: coverImage,
@@ -143,6 +144,7 @@ export async function updateRamble(
     .update({
       title: fields.title,
       subtitle: fields.subtitle || null,
+      excerpt: fields.excerpt,
       slug,
       content: fields.content,
       cover_alt: fields.coverAlt || null,

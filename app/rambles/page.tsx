@@ -4,7 +4,7 @@ import { redirect } from "next/navigation";
 import { Ramble } from "../../data/rambles";
 import { createClient } from "../../utils/supabase/server";
 import RamblesPagination from "../../components/rambles-pagination";
-import { getRambleTitle, rambleExcerpt } from "../../utils/rambles/format";
+import { getRambleTitle, getRambleExcerpt } from "../../utils/rambles/format";
 import {
   getTotalPages,
   parseRamblesPage,
@@ -108,7 +108,7 @@ export default async function RamblesPage({ searchParams }: Props) {
               )}
 
               <p className="mt-2 line-clamp-3 text-sm text-slate-400">
-                {rambleExcerpt(item.content)}
+                {getRambleExcerpt(item)}
               </p>
 
               <span className="mt-auto pt-4 text-xs text-slate-500">

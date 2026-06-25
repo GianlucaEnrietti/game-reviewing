@@ -3,7 +3,7 @@ import { Metadata } from "next";
 import MarkdownContent from "../../../components/markdown-content";
 import CommentsSection from "../../../components/comments/comments-section";
 import { getNewsBySlug } from "../../../utils/news/get-news-by-slug";
-import { getNewsTitle, newsExcerpt } from "../../../utils/news/format";
+import { getNewsTitle, getNewsExcerpt } from "../../../utils/news/format";
 import { buildArticleShareMetadata } from "../../../utils/seo/article-metadata";
 
 type Props = {
@@ -19,7 +19,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   }
 
   const title = getNewsTitle(newsItem);
-  const description = newsItem.subtitle || newsExcerpt(newsItem.content);
+  const description = newsItem.subtitle || getNewsExcerpt(newsItem);
 
   return buildArticleShareMetadata({
     title,

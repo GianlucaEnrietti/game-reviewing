@@ -3,6 +3,7 @@ export type Ramble = {
   created_at: string;
   title: string;
   subtitle: string | null;
+  excerpt: string | null;
   slug: string;
   content: string;
   cover_image: string | null;

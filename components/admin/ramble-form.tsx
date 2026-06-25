@@ -11,6 +11,7 @@ import MarkdownEditor from "./markdown-editor";
 type FormValues = {
   title: string;
   subtitle: string;
+  excerpt: string;
   slug: string;
   content: string;
   coverAlt: string;
@@ -39,6 +40,7 @@ export default function RambleForm({ ramble }: Props) {
     defaultValues: {
       title: ramble?.title ?? "",
       subtitle: ramble?.subtitle ?? "",
+      excerpt: ramble?.excerpt ?? "",
       slug: ramble?.slug ?? "",
       content: ramble?.content ?? "",
       coverAlt: ramble?.cover_alt ?? "",
@@ -87,6 +89,7 @@ export default function RambleForm({ ramble }: Props) {
     const formData = new FormData();
     formData.append("title", values.title);
     formData.append("subtitle", values.subtitle);
+    formData.append("excerpt", values.excerpt);
     formData.append("slug", values.slug);
     formData.append("content", values.content);
     formData.append("coverAlt", values.coverAlt);
@@ -133,6 +136,20 @@ export default function RambleForm({ ramble }: Props) {
           className={inputClass}
           {...register("subtitle")}
         />
+      </div>
+
+      <div>
+        <label className={labelClass} htmlFor="excerpt">
+          Extracto
+        </label>
+        <input
+          id="excerpt"
+          className={inputClass}
+          {...register("excerpt", { required: "El extracto es obligatorio." })}
+        />
+        {errors.excerpt && (
+          <p className="mt-1 text-sm text-red-400">{errors.excerpt.message}</p>
+        )}
       </div>
 
       <div>

@@ -7,8 +7,10 @@ import { Ramble } from "../data/rambles";
 import StarDisplay from "../components/star-display";
 import RandomReviewsSlider from "../components/random-reviews-slider";
 import { getRandomReviews } from "../utils/reviews/random-reviews";
-import { getNewsTitle, newsExcerpt } from "../utils/news/format";
-import { getRambleTitle, rambleExcerpt } from "../utils/rambles/format";
+import FeaturedPostHero from "../components/featured-post-hero";
+import { getFeaturedPost, isFeaturedPost } from "../utils/featured/get-featured-post";
+import { getNewsTitle, getNewsExcerpt } from "../utils/news/format";
+import { getRambleTitle, getRambleExcerpt } from "../utils/rambles/format";
 
 export const metadata = {
   description: "Reseñas, opiniones y noticias sobre videojuegos",
@@ -23,8 +25,23 @@ function formatDate(date: string) {
   });
 }
 
+function excludeFeatured<T extends { slug: string }>(
+  items: T[],
+  type: "review" | "news" | "opinion",
+  featured: Awaited<ReturnType<typeof getFeaturedPost>>
+): T[] {
+  const filtered =
+    featured && isFeaturedPost(type, featured.slug, featured)
+      ? items.filter((item) => item.slug !== featured.slug)
+      : items;
+
+  return filtered.slice(0, 3);
+}
+
 export default async function Home() {
   const supabase = await createClient();
+  const featured = await getFeaturedPost();
+
   const [
     { data: recentReviews, error },
     randomReviews,
@@ -35,22 +52,26 @@ export default async function Home() {
       .from("reviews")
       .select("*")
       .order("created_at", { ascending: false })
-      .limit(3)
+      .limit(4)
       .returns<Review[]>(),
     getRandomReviews(),
     supabase
       .from("news")
       .select("*")
       .order("created_at", { ascending: false })
-      .limit(3)
+      .limit(4)
       .returns<News[]>(),
     supabase
       .from("rambles")
       .select("*")
       .order("created_at", { ascending: false })
-      .limit(3)
+      .limit(4)
       .returns<Ramble[]>(),
   ]);
+
+  const visibleReviews = excludeFeatured(recentReviews ?? [], "review", featured);
+  const visibleNews = excludeFeatured(recentNews ?? [], "news", featured);
+  const visibleRambles = excludeFeatured(recentRambles ?? [], "opinion", featured);
 
   return (
     <Container>
@@ -65,6 +86,8 @@ export default async function Home() {
         </p>
       </section>
 
+      {featured && <FeaturedPostHero post={featured} />}
+
       <section className="mt-10">
         <h2 className="text-xl font-semibold">Reseñas más recientes</h2>
 
@@ -75,7 +98,7 @@ export default async function Home() {
         )}
 
         <div className="mt-5 grid gap-4 md:grid-cols-3">
-          {(recentReviews ?? []).map((review) => (
+          {visibleReviews.map((review) => (
             <article
               key={review.id}
               className="overflow-hidden rounded-xl border border-slate-800 bg-slate-900"
@@ -140,7 +163,7 @@ export default async function Home() {
         )}
 
         <div className="mt-5 grid gap-4 md:grid-cols-3">
-          {(recentNews ?? []).map((item) => (
+          {visibleNews.map((item) => (
             <article
               key={item.id}
               className="overflow-hidden rounded-xl border border-slate-800 bg-slate-900"
@@ -170,7 +193,7 @@ export default async function Home() {
                   </p>
                 )}
                 <p className="mt-3 line-clamp-3 text-sm text-slate-300">
-                  {newsExcerpt(item.content)}
+                  {getNewsExcerpt(item)}
                 </p>
 
                 <div className="mt-4 flex items-center justify-between text-sm text-slate-400">
@@ -187,7 +210,7 @@ export default async function Home() {
           ))}
         </div>
 
-        {!newsError && (recentNews ?? []).length === 0 && (
+        {!newsError && visibleNews.length === 0 && (
           <p className="mt-4 text-sm text-slate-400">
             Todavía no hay noticias publicadas.
           </p>
@@ -210,7 +233,7 @@ export default async function Home() {
         )}
 
         <div className="mt-5 grid gap-4 md:grid-cols-3">
-          {(recentRambles ?? []).map((item) => (
+          {visibleRambles.map((item) => (
             <article
               key={item.id}
               className="overflow-hidden rounded-xl border border-slate-800 bg-slate-900"
@@ -240,7 +263,7 @@ export default async function Home() {
                   </p>
                 )}
                 <p className="mt-3 line-clamp-3 text-sm text-slate-300">
-                  {rambleExcerpt(item.content)}
+                  {getRambleExcerpt(item)}
                 </p>
 
                 <div className="mt-4 flex items-center justify-between text-sm text-slate-400">
@@ -257,7 +280,7 @@ export default async function Home() {
           ))}
         </div>
 
-        {!ramblesError && (recentRambles ?? []).length === 0 && (
+        {!ramblesError && visibleRambles.length === 0 && (
           <p className="mt-4 text-sm text-slate-400">
             Todavía no hay rambles publicados.
           </p>
