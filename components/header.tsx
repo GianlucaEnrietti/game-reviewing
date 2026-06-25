@@ -20,7 +20,6 @@ export default async function Header() {
               alt="Vicios y Noticias"
               width={60}
               height={60}
-              className="rounded-full"
               priority
             />
           </Link>

@@ -18,8 +18,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="es">
-      <body className={`${inter.variable} min-h-screen font-sans bg-slate-950 text-slate-100`}>
+    <html lang="es" className="overflow-x-hidden">
+      <body
+        className={`${inter.variable} min-h-screen overflow-x-hidden font-sans bg-slate-950 text-slate-100`}
+      >
         <InviteHashRedirect />
         <Header />
         <main>{children}</main>
