@@ -4,6 +4,7 @@ import { headers } from "next/headers";
 import { createClient } from "../utils/supabase/server";
 import { verifyTurnstileToken } from "../utils/security/turnstile";
 import { CommentPostType } from "../data/comments";
+import { notifyDiscordModeration } from "../utils/notifications/discord";
 
 export type CreateCommentState = {
   error?: string;
@@ -48,12 +49,12 @@ export async function createComment(
     return { error: "Publicación inválida." };
   }
 
-  if (!nickname || nickname.length < 2 || nickname.length > 40) {
-    return { error: "El nickname debe tener entre 2 y 40 caracteres." };
+  if (!nickname || nickname.length < 2 || nickname.length > 20) {
+    return { error: "El nickname debe tener entre 2 y 20 caracteres." };
   }
 
-  if (!content || content.length < 3 || content.length > 2000) {
-    return { error: "El comentario debe tener entre 3 y 2000 caracteres." };
+  if (!content || content.length < 3 || content.length > 300) {
+    return { error: "El comentario debe tener entre 3 y 300 caracteres." };
   }
 
   const headerList = await headers();
@@ -77,5 +78,7 @@ export async function createComment(
     return { error: "No se pudo guardar el comentario. Intentá más tarde." };
   }
 
+  notifyDiscordModeration(nickname, content, postSlug, postType);
+  
   return { success: true };
 }
